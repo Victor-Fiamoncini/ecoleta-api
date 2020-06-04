@@ -8,6 +8,8 @@
     "node": "^12.16.1"
   },
   "scripts": {
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "yarn lint -- --fix",
     "dev": "ts-node-dev --respawn --transpileOnly ./src/server.ts",
     "build": "tsc -p . --experimentalDecorators \"true\"",
     "start": "ts-node ./build/server.js",

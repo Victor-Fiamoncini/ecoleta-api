@@ -1,7 +1,7 @@
 import { ObjectSchema } from 'joi'
 import { NextFunction, Response } from 'express'
 
-import errors from '../config/messages/errors'
+import errors from '../messages/errors'
 
 export default async (
 	res: Response,

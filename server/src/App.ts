@@ -4,13 +4,14 @@ import cors from 'cors'
 import morgan from 'morgan'
 import { resolve } from 'path'
 
-import routes from './app/routes'
-import error from './app/middlewares/error'
+import routes from './routes'
 
 export default class App {
-	private readonly app: Application = express()
+	private app: Application
 
-	public constructor() {
+	constructor() {
+		this.app = express()
+
 		this.configs()
 		this.middlewares()
 	}
@@ -39,6 +40,5 @@ export default class App {
 		)
 
 		this.app.use(routes)
-		this.app.use(error)
 	}
 }
