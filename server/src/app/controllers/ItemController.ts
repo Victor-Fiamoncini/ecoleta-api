@@ -1,6 +1,8 @@
 import { Request, Response } from 'express'
 import { ItemDAO } from '../models/dao'
 
+import errors from '../messages/errors'
+
 class ItemController {
 	public async index(request: Request, response: Response) {
 		try {
@@ -8,7 +10,7 @@ class ItemController {
 			const items = await itemDao.findAll()
 
 			if (items.length === 0) {
-				return response.status(404).json({ error: 'Items not found' })
+				return response.status(404).json({ error: errors.items.notFound })
 			}
 
 			const { APP_URL, FILE_URL_PREFIX } = process.env

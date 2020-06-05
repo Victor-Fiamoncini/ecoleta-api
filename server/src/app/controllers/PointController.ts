@@ -2,6 +2,8 @@ import { Request, Response } from 'express'
 import { PointDTO } from '../models/dto'
 import { PointDAO, PointItemDAO } from '../models/dao'
 
+import errors from '../messages/errors'
+
 class PointController {
 	public async index(request: Request, response: Response) {
 		try {
@@ -11,7 +13,7 @@ class PointController {
 			const points = await pointDao.findAll(String(city), String(uf))
 
 			if (points.length === 0) {
-				return response.status(404).json({ error: 'Points not found' })
+				return response.status(404).json({ error: errors.points.notFound })
 			}
 
 			return response.status(200).json(points)
@@ -28,7 +30,9 @@ class PointController {
 			)
 
 			if (pointsWithItem.length === 0) {
-				return response.status(404).json({ error: 'Point not found' })
+				return response
+					.status(404)
+					.json({ error: errors.points.notFoundSingle })
 			}
 
 			const { APP_URL, FILE_URL_PREFIX } = process.env
