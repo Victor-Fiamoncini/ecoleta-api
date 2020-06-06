@@ -69,35 +69,15 @@
 						</div>
 					</div>
 				</fieldset>
-				<fieldset>
+				<fieldset v-if="items">
 					<legend>
 						<h2>Ítens de coleta</h2>
 						<span>Selecione um ou mais items abaixo</span>
 					</legend>
 					<ul class="items-grid">
-						<li>
-							<img src="http://localhost:3333/files/lampadas.svg" alt />
-							<span>Óleo de cozinha</span>
-						</li>
-						<li>
-							<img src="http://localhost:3333/files/lampadas.svg" alt />
-							<span>Óleo de cozinha</span>
-						</li>
-						<li>
-							<img src="http://localhost:3333/files/lampadas.svg" alt />
-							<span>Óleo de cozinha</span>
-						</li>
-						<li class="selected">
-							<img src="http://localhost:3333/files/lampadas.svg" alt />
-							<span>Óleo de cozinha</span>
-						</li>
-						<li>
-							<img src="http://localhost:3333/files/lampadas.svg" alt />
-							<span>Óleo de cozinha</span>
-						</li>
-						<li>
-							<img src="http://localhost:3333/files/lampadas.svg" alt />
-							<span>Óleo de cozinha</span>
+						<li v-for="(item, i) in items" :key="i">
+							<img :src="item.image_url" :alt="item.name" />
+							<span>{{ item.name }}</span>
 						</li>
 					</ul>
 				</fieldset>
@@ -108,6 +88,7 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 import Map from '@/components/utils/Map'
 
 export default {
@@ -123,10 +104,18 @@ export default {
 			uf: '',
 			city: '',
 			image: '',
-			items: [],
+			seletedItems: [],
 		},
 	}),
+	computed: {
+		...mapGetters('items', ['items']),
+	},
+	async created() {
+		await this.actionFetchItems()
+	},
 	methods: {
+		...mapActions('items', ['actionFetchItems']),
+
 		doSubmit() {
 			return ''
 		},

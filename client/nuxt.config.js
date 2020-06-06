@@ -1,3 +1,8 @@
+import { resolve } from 'path'
+import { config } from 'dotenv'
+
+config({ path: resolve(__dirname, '.env') })
+
 export default {
 	mode: 'spa',
 	head: {
@@ -44,10 +49,10 @@ export default {
 	],
 	plugins: [],
 	buildModules: ['@nuxtjs/eslint-module', '@nuxtjs/router'],
-	modules: ['@nuxtjs/axios', '@nuxtjs/dotenv', 'nuxt-leaflet'],
+	modules: ['@nuxtjs/dotenv', 'nuxt-leaflet'],
 	axios: {},
 	env: {
-		apiUrl: process.env.MAIN_API_URL || 'http://localhost:8000',
+		apiUrl: process.env.MAIN_API_URL,
 	},
 	build: {
 		extend(config, ctx) {},
