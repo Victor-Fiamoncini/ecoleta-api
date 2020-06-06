@@ -26,7 +26,12 @@ export default class App {
 	}
 
 	private middlewares(): void {
-		const { CLIENT_HOST, FILE_URL_PREFIX, NODE_ENV } = process.env
+		const {
+			CLIENT_HOST,
+			FILE_URL_PREFIX,
+			NODE_ENV,
+			UPLOAD_URL_PREFIX,
+		} = process.env
 
 		if (NODE_ENV === 'production') {
 			this.app.use(cors({ origin: CLIENT_HOST }))
@@ -40,6 +45,11 @@ export default class App {
 		this.app.use(
 			`/${FILE_URL_PREFIX}`,
 			express.static(resolve(__dirname, '..', 'temp', 'static'))
+		)
+
+		this.app.use(
+			`/${UPLOAD_URL_PREFIX}`,
+			express.static(resolve(__dirname, '..', 'temp', 'uploads'))
 		)
 
 		this.app.use(routes)

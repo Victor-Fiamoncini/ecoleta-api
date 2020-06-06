@@ -5,6 +5,7 @@ export default {
 		state.items = payload
 	},
 	[Types.FETCH_ITEMS_ERROR]: (state, payload) => {
+		state.items = []
 		state.errors = [...state.errors, payload]
 	},
 }

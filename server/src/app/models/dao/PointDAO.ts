@@ -26,7 +26,7 @@ export default class PointDAO {
 				'points.name',
 				'points.email',
 				'points.whatsapp',
-				'points.image',
+				'points.image AS image_url',
 				'points.latitude',
 				'points.longitude',
 				'points.city',
@@ -37,6 +37,10 @@ export default class PointDAO {
 			.join('point_items AS pi', 'points.id', '=', 'pi.point_id')
 			.join('items', 'items.id', '=', 'pi.item_id')
 			.where('points.id', '=', id)
+	}
+
+	public async findByName(name: string): Promise<PointDTO> {
+		return await knex(this.table).select('*').where('name', '=', name).first()
 	}
 
 	public async create(point: PointDTO): Promise<PointDTO> {

@@ -6,9 +6,9 @@ import errors from '../messages/errors'
 
 class PointController {
 	public async index(request: Request, response: Response) {
-		try {
-			const { city = '', uf = '' } = request.query
+		const { city = '', uf = '' } = request.query
 
+		try {
 			const pointDao = new PointDAO()
 			const points = await pointDao.findAll(String(city), String(uf))
 
@@ -16,7 +16,14 @@ class PointController {
 				return response.status(404).json({ error: errors.points.notFound })
 			}
 
-			return response.status(200).json(points)
+			const { APP_URL, UPLOAD_URL_PREFIX } = process.env
+
+			const serializedItems = points.map(point => ({
+				...point,
+				image_url: `${APP_URL}/${UPLOAD_URL_PREFIX}/${point.image}`,
+			}))
+
+			return response.status(200).json(serializedItems)
 		} catch (err) {
 			return response.status(500).json(err)
 		}
@@ -25,29 +32,30 @@ class PointController {
 	public async show(request: Request, response: Response) {
 		try {
 			const pointDao = new PointDAO()
-			const pointsWithItem = await pointDao.findWithItems(
+			const pointWithItems = await pointDao.findWithItems(
 				parseInt(request.params.id)
 			)
 
-			if (pointsWithItem.length === 0) {
+			if (pointWithItems.length === 0) {
 				return response
 					.status(404)
 					.json({ error: errors.points.notFoundSingle })
 			}
 
-			const { APP_URL, FILE_URL_PREFIX } = process.env
+			const { APP_URL, FILE_URL_PREFIX, UPLOAD_URL_PREFIX } = process.env
 
-			const serializedItems = pointsWithItem.map(pointWithItem => ({
+			const serializedItems = pointWithItems.map(pointWithItem => ({
 				title: pointWithItem.title,
 				image_url: `${APP_URL}/${FILE_URL_PREFIX}/${pointWithItem.image}`,
 			}))
 
-			const serializedPoint = pointsWithItem[0]
+			const serializedPoint = pointWithItems[0]
 			delete serializedPoint.image
 			delete serializedPoint.title
 
 			return response.status(200).json({
 				...serializedPoint,
+				image_url: `${APP_URL}/${UPLOAD_URL_PREFIX}/${serializedPoint.image_url}`,
 				items: serializedItems,
 			})
 		} catch (err) {
@@ -56,19 +64,28 @@ class PointController {
 	}
 
 	public async store(request: Request, response: Response) {
-		try {
-			const { items } = request.body
+		const { items, name } = request.body
 
+		try {
 			const pointDao = new PointDAO()
+
+			if (await pointDao.findByName(name)) {
+				return response.status(400).json({ error: errors.points.alreadyExists })
+			}
+
+			request.body.image = request.file ? request.file.filename : ''
 			const pointDto = new PointDTO(request.body)
 			const point = await pointDao.create(pointDto)
 
-			const pointItemDao = new PointItemDAO()
-			const pointItems = items.map((itemId: number) => ({
-				item_id: itemId,
-				point_id: point.id,
-			}))
+			const pointItems = items
+				.split(',')
+				.map((item: string) => item.trim())
+				.map((item: number) => ({
+					item_id: item,
+					point_id: point.id,
+				}))
 
+			const pointItemDao = new PointItemDAO()
 			await pointItemDao.create(pointItems)
 
 			return response.status(201).json(point)
