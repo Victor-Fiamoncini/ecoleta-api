@@ -15,8 +15,14 @@ class PointController {
 			if (points.length === 0) {
 				return response.status(404).json({ error: errors.points.notFound })
 			}
+			const { APP_URL, UPLOAD_URL_PREFIX } = process.env
 
-			return response.status(200).json(points)
+			const serializedPoints = points.map(point => ({
+				...point,
+				image_url: `${APP_URL}/${UPLOAD_URL_PREFIX}/${point.image}`,
+			}))
+
+			return response.status(200).json(serializedPoints)
 		} catch (err) {
 			return response.status(500).json(err)
 		}
@@ -59,6 +65,8 @@ class PointController {
 		try {
 			const { items } = request.body
 
+			request.body.image = request.file ? request.file.filename : ''
+
 			const pointDao = new PointDAO()
 			const pointDto = new PointDTO(request.body)
 			const point = await pointDao.create(pointDto)
@@ -67,8 +75,8 @@ class PointController {
 			const pointItems = items
 				.split(',')
 				.map((item: string) => item.trim())
-				.map((itemId: number) => ({
-					item_id: itemId,
+				.map((item: number) => ({
+					item_id: item,
 					point_id: point.id,
 				}))
 

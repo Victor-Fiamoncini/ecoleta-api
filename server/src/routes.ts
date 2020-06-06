@@ -18,7 +18,7 @@ router.get('/points', controllers.PointController.index)
 router.get('/points/:id', controllers.PointController.show)
 router.post(
 	'/points',
-	[validators.PointValidator.store, middlewares.upload.single('image')],
+	[middlewares.upload.single('image')],
 	controllers.PointController.store
 )
 
