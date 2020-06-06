@@ -56,7 +56,7 @@
 					<div class="field-group">
 						<div class="field">
 							<label for="uf">Estado (UF)</label>
-							<select id="uf" name="uf" @change="uf">
+							<select id="uf" name="uf" @change="doChangeStateAndCities">
 								<option v-if="states.length === 0" disabled selected>
 									Carregando...
 								</option>
@@ -88,13 +88,18 @@
 						</div>
 					</div>
 				</fieldset>
-				<fieldset v-if="items">
+				<fieldset v-if="fetchedItems">
 					<legend>
 						<h2>Ítens de coleta</h2>
 						<span>Selecione um ou mais items abaixo</span>
 					</legend>
 					<ul class="items-grid">
-						<li v-for="(item, i) in items" :key="i">
+						<li
+							v-for="item in fetchedItems"
+							:key="item.id"
+							:class="{ selected: form.items.includes(item.id) }"
+							@click="doSelectItem(item.id)"
+						>
 							<img :src="item.image_url" :alt="item.name" />
 							<span>{{ item.name }}</span>
 						</li>
@@ -120,18 +125,20 @@ export default {
 			name: 'Ponto de coleta de Rodeio',
 			email: 'victor.fiamoncini@gmail.com',
 			whatsapp: '47988897443',
-			image: '',
+			image: 'default.png',
 			uf: '',
 			city: '',
 			latitude: 0,
 			longitude: 0,
-			seletedItems: [],
+			items: [],
 		},
 		states: [],
 		cities: [],
 	}),
 	computed: {
-		...mapGetters('items', ['items']),
+		...mapGetters('items', {
+			fetchedItems: ['items'],
+		}),
 	},
 	async created() {
 		await this.actionFetchItems()
@@ -154,7 +161,7 @@ export default {
 		...mapActions('items', ['actionFetchItems']),
 		...mapActions('points', ['actionStorePoint']),
 
-		async uf({ target }) {
+		async doChangeStateAndCities({ target }) {
 			this.form.uf = target.value
 
 			this.cities = await this.$locations.byUf(target.value)
@@ -167,11 +174,17 @@ export default {
 			this.form.latitude = latitude
 			this.form.longitude = longitude
 		},
+		doSelectItem(id) {
+			const alreadySeleted = this.form.items.includes(id)
+
+			if (!alreadySeleted) {
+				this.form.items = [...this.form.items, id]
+			} else {
+				this.form.items = this.form.items.filter(item => item !== id)
+			}
+		},
 		async doStorePoint() {
-			await this.actionStorePoint({
-				...this.form,
-				items: this.seletedItems,
-			})
+			await this.actionStorePoint(this.form)
 		},
 	},
 	head: () => ({

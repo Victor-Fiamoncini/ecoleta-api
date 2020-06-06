@@ -185,7 +185,8 @@
 
   text-align: center;
 
-  cursor: pointer;
+	cursor: pointer;
+	transition: all .3s;
 }
 
 .items-grid li span {

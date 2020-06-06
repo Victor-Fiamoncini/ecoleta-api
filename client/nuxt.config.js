@@ -22,7 +22,7 @@ export default {
 			},
 		],
 		link: [
-			{ rel: 'icon', type: 'image/x-icon', href: '/images/logo.svg' },
+			{ rel: 'icon', type: 'image/x-icon', href: '/images/favicon.png' },
 			{
 				rel: 'stylesheet',
 				href:
@@ -49,10 +49,14 @@ export default {
 	],
 	plugins: ['@/plugins/locations'],
 	buildModules: ['@nuxtjs/eslint-module', '@nuxtjs/router'],
-	modules: ['@nuxtjs/dotenv', 'nuxt-leaflet'],
+	modules: ['@nuxtjs/dotenv', 'nuxt-leaflet', '@nuxtjs/toast'],
 	axios: {},
 	env: {
 		apiUrl: process.env.MAIN_API_URL,
+	},
+	toast: {
+		iconPack: 'fontawesome',
+		position: 'top-right',
 	},
 	build: {
 		extend(config, ctx) {},
