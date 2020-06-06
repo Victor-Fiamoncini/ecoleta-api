@@ -31,10 +31,12 @@ export default class App {
 		if (NODE_ENV === 'production') {
 			this.app.use(cors({ origin: CLIENT_HOST }))
 			this.app.use(helmet())
+		} else {
+			this.app.use(cors())
+			this.app.use(morgan('dev'))
 		}
 
 		this.app.use(express.json())
-		this.app.use(morgan('dev'))
 		this.app.use(
 			`/${FILE_URL_PREFIX}`,
 			express.static(resolve(__dirname, '..', 'temp', 'static'))
